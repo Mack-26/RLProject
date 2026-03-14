@@ -8,15 +8,14 @@ set -e
 ENV_NAME="mqe"
 
 echo "=== Loading modules ==="
-module load anaconda3/2023.09   # provides conda; adjust version if needed
+module load python3.10-anaconda/2023.03
 module load cuda/12.1.1
-module load cudnn/12.1-v8.9.0
 
 # Initialize conda for this shell session
 source "$(conda info --base)/etc/profile.d/conda.sh"
 
 echo "=== Creating conda environment: $ENV_NAME ==="
-conda create -n $ENV_NAME python=3.11 -y
+conda create -n $ENV_NAME python=3.10 -y
 conda activate $ENV_NAME
 
 echo "=== Installing JAX (CUDA 12) ==="

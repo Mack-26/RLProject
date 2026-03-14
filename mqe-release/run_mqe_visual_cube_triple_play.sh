@@ -31,9 +31,8 @@ echo "  Node : $(hostname)"
 echo "  GPU  : $(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null || echo 'N/A')"
 
 # ── Environment ─────────────────────────────────────────────────────────────────
-module load anaconda3/2023.09
+module load python3.10-anaconda/2023.03
 module load cuda/12.1.1
-module load cudnn/12.1-v8.9.0
 
 # Initialize conda for non-interactive shell (required in SLURM)
 source "$(conda info --base)/etc/profile.d/conda.sh"
