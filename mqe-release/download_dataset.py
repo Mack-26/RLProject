@@ -1,0 +1,40 @@
+"""
+download_dataset.py
+Downloads the visual-cube-triple-play-v0 dataset (train + val) from OGBench.
+
+Usage (run on a Great Lakes login node after 'pip install -e .[train]'):
+    python download_dataset.py --dataset_dir /path/to/data
+
+The dataset files saved:
+    <dataset_dir>/visual-cube-triple-play-v0.npz       (~2-3 GB)
+    <dataset_dir>/visual-cube-triple-play-v0-val.npz   (smaller)
+"""
+
+import argparse
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'impls'))
+
+import ogbench
+
+DATASET_NAME = 'visual-cube-triple-play-v0'
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--dataset_dir',
+        default=os.path.expanduser('~/ogbench_data'),
+        help='Directory to save the downloaded dataset files.',
+    )
+    args = parser.parse_args()
+
+    os.makedirs(args.dataset_dir, exist_ok=True)
+    print(f'Downloading {DATASET_NAME} to {args.dataset_dir} ...')
+    ogbench.download_datasets([DATASET_NAME], dataset_dir=args.dataset_dir)
+    print('Done.')
+    print(f'  Train: {args.dataset_dir}/{DATASET_NAME}.npz')
+    print(f'  Val:   {args.dataset_dir}/{DATASET_NAME}-val.npz')
+    print()
+    print('Pass this path to the SLURM job with --dataset_path:')
+    print(f'  --dataset_path={args.dataset_dir}/{DATASET_NAME}.npz')
