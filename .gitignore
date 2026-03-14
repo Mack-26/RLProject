@@ -1,0 +1,24 @@
+# Papers / large binaries
+*.pdf
+
+# Dataset files
+*.npz
+*.hdf5
+ogbench_data/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# JAX/experiment outputs
+logs/
+wandb/
+checkpoints/
+*.log
+
+# macOS
+.DS_Store
