@@ -12,6 +12,7 @@
 #SBATCH --job-name=mqe_visual_cube_triple
 #SBATCH --account=ece567w26_class
 #SBATCH --partition=gpu
+#SBATCH --qos=class
 #SBATCH --gpus=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=32G
