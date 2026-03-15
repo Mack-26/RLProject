@@ -17,8 +17,8 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=32G
 #SBATCH --time=07:30:00                 # class account MaxWall=8h; 7.5h gives buffer
-#SBATCH --output=logs/mqe_vct_%A_%a.out
-#SBATCH --error=logs/mqe_vct_%A_%a.err
+#SBATCH --output=/home/aromanan/RLProject/logs/mqe_vct_%A_%a.out
+#SBATCH --error=/home/aromanan/RLProject/logs/mqe_vct_%A_%a.err
 #SBATCH --array=0-3                     # 4 seeds, matching paper's pixel-based eval
 
 # ── Seed: use SLURM array index if available, else fall back to $SEED ──────────
@@ -44,9 +44,9 @@ export MUJOCO_GL=egl
 export EGL_DEVICE_ID=${SLURM_STEP_GPUS:-0}
 
 # ── Paths ───────────────────────────────────────────────────────────────────────
-REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_DIR="$HOME/RLProject/mqe-release"
 IMPLS_DIR="$REPO_DIR/impls"
-mkdir -p "$REPO_DIR/logs"
+mkdir -p "$HOME/RLProject/logs"
 
 # Path to the pre-downloaded dataset (run download_dataset.py first).
 # Default: ~/ogbench_data/visual-cube-triple-play-v0.npz
