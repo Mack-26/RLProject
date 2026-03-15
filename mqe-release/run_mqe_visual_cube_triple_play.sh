@@ -35,8 +35,7 @@ echo "  GPU  : $(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null |
 module load python3.10-anaconda/2023.03
 module load cuda/12.1.1
 
-# Use conda env directly via full path (avoids conda activate issues in SLURM)
-export PATH="$HOME/.conda/envs/mqe/bin:$PATH"
+PYTHON="/home/aromanan/.conda/envs/mqe/bin/python"
 
 # EGL rendering for MuJoCo (headless GPU rendering)
 export MUJOCO_GL=egl
@@ -66,7 +65,7 @@ echo "  Dataset : $DATASET_PATH"
 
 cd "$IMPLS_DIR"
 
-python main.py \
+$PYTHON main.py \
     --run_group="visual_cube_triple_play_reproduce" \
     --seed=$SEED \
     --env_name=visual-cube-triple-play-v0 \
