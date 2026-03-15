@@ -10,12 +10,12 @@
 #   sbatch --export=SEED=0 run_mqe_visual_cube_triple_play.sh
 
 #SBATCH --job-name=mqe_visual_cube_triple
-#SBATCH --account=<YOUR_ACCOUNT>        # e.g., eecs567s001 -- change this
+#SBATCH --account=ece567w26_class
 #SBATCH --partition=gpu
 #SBATCH --gpus=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=32G
-#SBATCH --time=10:00:00                 # paper reports ~6h on A6000; 10h is safe
+#SBATCH --time=07:30:00                 # class account MaxWall=8h; 7.5h gives buffer
 #SBATCH --output=logs/mqe_vct_%A_%a.out
 #SBATCH --error=logs/mqe_vct_%A_%a.err
 #SBATCH --array=0-3                     # 4 seeds, matching paper's pixel-based eval
