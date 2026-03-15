@@ -35,9 +35,8 @@ echo "  GPU  : $(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null |
 module load python3.10-anaconda/2023.03
 module load cuda/12.1.1
 
-# Initialize conda for non-interactive shell (required in SLURM)
-source "$(conda info --base)/etc/profile.d/conda.sh"
-conda activate mqe
+# Use conda env directly via full path (avoids conda activate issues in SLURM)
+export PATH="$HOME/.conda/envs/mqe/bin:$PATH"
 
 # EGL rendering for MuJoCo (headless GPU rendering)
 export MUJOCO_GL=egl
