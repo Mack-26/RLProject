@@ -10,13 +10,12 @@
 #   sbatch --export=SEED=0 run_mqe_visual_cube_triple_play.sh
 
 #SBATCH --job-name=mqe_visual_cube_triple
-#SBATCH --account=ece567w26_class
+#SBATCH --account=engin1
 #SBATCH --partition=gpu
-#SBATCH --qos=class
 #SBATCH --gpus=1
-#SBATCH --cpus-per-task=4
-#SBATCH --mem=32G
-#SBATCH --time=07:30:00                 # class account MaxWall=8h; 7.5h gives buffer
+#SBATCH --cpus-per-task=2
+#SBATCH --mem=64G
+#SBATCH --time=12:00:00                 # engin1 has no strict MaxWall; 12h covers ~8.5h runtime
 #SBATCH --output=/home/aromanan/RLProject/logs/mqe_vct_%A_%a.out
 #SBATCH --error=/home/aromanan/RLProject/logs/mqe_vct_%A_%a.err
 #SBATCH --array=0-3                     # 4 seeds, matching paper's pixel-based eval
@@ -71,6 +70,7 @@ $PYTHON main.py \
     --env_name=visual-cube-triple-play-v0 \
     --dataset_path="$DATASET_PATH" \
     --train_steps=500000 \
+    --save_interval=100000 \
     --log_interval=5000 \
     --eval_interval=100000 \
     --eval_episodes=50 \
