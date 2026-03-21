@@ -1,8 +1,6 @@
-ogbench  # Use the PyPI version of OGBench. Replace this with `pip install -e .` if you want to use the local version.
-jax[cuda12] >= 0.4.26
-flax >= 0.8.4
-distrax >= 0.1.5
-ml_collections
-matplotlib
-moviepy
-wandb
+# Install the local ogbench (includes antmaze-colossal environments) from the repo root:
+#   pip install -e ".[train]"
+# That covers jax, flax, distrax, ml_collections, wandb, matplotlib, moviepy,
+# mujoco, dm_control, and gymnasium. Then install the two extras below:
+absl-py
+tqdm
