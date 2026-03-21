@@ -9,12 +9,13 @@
 # SEED:  0 | 1 | 2 | 3
 
 #SBATCH --job-name=rl_exp
-#SBATCH --account=<YOUR_ACCOUNT>        # change this
+#SBATCH --account=ece567w26_class
 #SBATCH --partition=gpu
+#SBATCH --qos=class
 #SBATCH --gpus=1
 #SBATCH --cpus-per-task=4
-#SBATCH --mem=32G
-#SBATCH --time=08:00:00
+#SBATCH --mem=64G
+#SBATCH --time=07:30:00
 #SBATCH --output=/home/aromanan/RLProject/mqe-release/logs/exp_%j.out
 #SBATCH --error=/home/aromanan/RLProject/mqe-release/logs/exp_%j.err
 
@@ -41,11 +42,16 @@ echo "  NODE     : $(hostname)"
 echo "  GPU      : $(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null || echo N/A)"
 
 # ── Environment ──────────────────────────────────────────────────────────────
-module load python/3.11.5
-module load cuda/12.1.1
-module load cudnn/12.1-v8.9.0
-source $(conda info --base)/etc/profile.d/conda.sh
-conda activate mqe
+module load python3.10-anaconda/2023.03
+# NOTE: do NOT load cuda/12.1.1 — it conflicts with JAX's pip-installed CUDA libs
+
+PYTHON="$HOME/.conda/envs/mqe/bin/python"   # conda activate fails in SLURM; use absolute path
+if [ ! -f "$PYTHON" ]; then
+    echo "ERROR: Python not found at $PYTHON — is the mqe conda env installed?"
+    exit 1
+fi
+
+export XLA_FLAGS="--xla_gpu_strict_conv_algorithm_picker=false"
 
 export MUJOCO_GL=egl
 export EGL_DEVICE_ID=${SLURM_STEP_GPUS:-0}
@@ -131,7 +137,7 @@ esac
 # ── Run ───────────────────────────────────────────────────────────────────────
 cd "$IMPLS_DIR"
 
-python "$IMPLS_DIR/main.py" \
+"$PYTHON" "$IMPLS_DIR/main.py" \
     --run_group="$RUN_GROUP" \
     --seed=$SEED \
     --env_name="$ENV" \
