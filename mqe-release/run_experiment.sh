@@ -51,7 +51,7 @@ export MUJOCO_GL=egl
 export EGL_DEVICE_ID=${SLURM_STEP_GPUS:-0}
 
 # ── Paths ────────────────────────────────────────────────────────────────────
-REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_DIR="$HOME/RLProject/mqe-release"
 IMPLS_DIR="$REPO_DIR/impls"
 mkdir -p "$REPO_DIR/logs"
 
