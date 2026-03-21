@@ -15,8 +15,8 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=32G
 #SBATCH --time=08:00:00
-#SBATCH --output=logs/exp_%j.out
-#SBATCH --error=logs/exp_%j.err
+#SBATCH --output=/home/aromanan/RLProject/mqe-release/logs/exp_%j.out
+#SBATCH --error=/home/aromanan/RLProject/mqe-release/logs/exp_%j.err
 
 # ── Defaults (overridden by --export in sbatch) ─────────────────────────────
 AGENT=${AGENT:-mqe}
@@ -44,6 +44,7 @@ echo "  GPU      : $(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/nu
 module load python/3.11.5
 module load cuda/12.1.1
 module load cudnn/12.1-v8.9.0
+source $(conda info --base)/etc/profile.d/conda.sh
 conda activate mqe
 
 export MUJOCO_GL=egl
@@ -130,7 +131,7 @@ esac
 # ── Run ───────────────────────────────────────────────────────────────────────
 cd "$IMPLS_DIR"
 
-python main.py \
+python "$IMPLS_DIR/main.py" \
     --run_group="$RUN_GROUP" \
     --seed=$SEED \
     --env_name="$ENV" \
