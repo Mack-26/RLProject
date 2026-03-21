@@ -18,7 +18,10 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'impls'))
 
 import ogbench
 
-DATASET_NAME = 'visual-cube-triple-play-v0'
+DATASETS = [
+    'visual-cube-triple-play-v0',
+    'visual-scene-play-v0',
+]
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -30,11 +33,15 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     os.makedirs(args.dataset_dir, exist_ok=True)
-    print(f'Downloading {DATASET_NAME} to {args.dataset_dir} ...')
-    ogbench.download_datasets([DATASET_NAME], dataset_dir=args.dataset_dir)
-    print('Done.')
-    print(f'  Train: {args.dataset_dir}/{DATASET_NAME}.npz')
-    print(f'  Val:   {args.dataset_dir}/{DATASET_NAME}-val.npz')
-    print()
-    print('Pass this path to the SLURM job with --dataset_path:')
-    print(f'  --dataset_path={args.dataset_dir}/{DATASET_NAME}.npz')
+    for name in DATASETS:
+        train_path = os.path.join(args.dataset_dir, f'{name}.npz')
+        if os.path.exists(train_path):
+            print(f'Already exists, skipping: {train_path}')
+            continue
+        print(f'Downloading {name} to {args.dataset_dir} ...')
+        ogbench.download_datasets([name], dataset_dir=args.dataset_dir)
+        print(f'  Done: {train_path}')
+
+    print('\nAll datasets ready. Dataset paths:')
+    for name in DATASETS:
+        print(f'  {args.dataset_dir}/{name}.npz')

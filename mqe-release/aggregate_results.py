@@ -1,10 +1,15 @@
 """
 aggregate_results.py
-Reads the eval CSV logs from all seeds and reports the mean ± stderr success rate,
-matching how Table 4 of the MQE paper is computed.
+Reads eval CSV logs and reports mean ± stderr success rate per (agent, env),
+matching the format of Table 4 in the MQE paper.
 
 Usage:
-    python aggregate_results.py --exp_dir exp/OGBench/visual_cube_triple_play_reproduce
+    python aggregate_results.py                        # all agents/envs
+    python aggregate_results.py --agents mqe           # MQE only
+    python aggregate_results.py --agents mqe,hiql --envs visual-cube-triple-play-v0
+
+Results are picked as: for each seed prefix (sd000, sd001, ...), use the run
+with the highest last logged step (handles multiple partial/resumed runs).
 """
 
 import argparse
@@ -12,77 +17,133 @@ import glob
 import os
 
 import numpy as np
-import pandas as pd
+
+PAPER_TARGETS = {
+    ('mqe',  'visual-cube-triple-play-v0'): 19.8,
+    ('hiql', 'visual-cube-triple-play-v0'): 21.0,
+    ('mqe',  'visual-scene-play-v0'):       38.1,
+    ('hiql', 'visual-scene-play-v0'):       49.9,
+}
+
+ENV_SHORTS = {
+    'visual-cube-triple-play-v0': 'visual_cube_triple',
+    'visual-scene-play-v0':       'visual_scene_play',
+}
+
+DEFAULT_AGENTS = ['mqe', 'hiql']
+DEFAULT_ENVS   = ['visual-cube-triple-play-v0', 'visual-scene-play-v0']
+
+
+def read_csv(path):
+    """Return list of dicts from a CSV file."""
+    rows = []
+    with open(path) as f:
+        lines = f.read().splitlines()
+    if len(lines) < 2:
+        return rows
+    headers = lines[0].split(',')
+    for line in lines[1:]:
+        vals = line.split(',')
+        if len(vals) == len(headers):
+            rows.append(dict(zip(headers, vals)))
+    return rows
+
+
+def best_run_for_seed(seed_dirs):
+    """Given a list of run directories for one seed, return (last_step, overall_success)
+    from the directory whose eval.csv has the highest last logged step."""
+    best_step = -1
+    best_success = None
+    for d in seed_dirs:
+        csv = os.path.join(d, 'eval.csv')
+        if not os.path.exists(csv):
+            continue
+        rows = read_csv(csv)
+        if not rows:
+            continue
+        last = rows[-1]
+        try:
+            step = int(last.get('step', -1))
+            success = float(last.get('evaluation/overall_success', -1))
+        except ValueError:
+            continue
+        if step > best_step:
+            best_step = step
+            best_success = success * 100.0
+    return best_step, best_success
+
+
+def gather_results(exp_base, agent, env):
+    """Return list of (seed, last_step, overall_success_pct) for all seeds found."""
+    env_short = ENV_SHORTS.get(env, env.replace('-', '_').replace('_v0', ''))
+    run_group = f'{agent}_{env_short}'
+    group_dir = os.path.join(exp_base, run_group)
+
+    if not os.path.isdir(group_dir):
+        return []
+
+    # Group directories by seed prefix (sd000, sd001, ...)
+    all_dirs = sorted(glob.glob(os.path.join(group_dir, 'sd*')))
+    seed_map = {}
+    for d in all_dirs:
+        name = os.path.basename(d)
+        prefix = name[:5]  # e.g. "sd000"
+        seed_map.setdefault(prefix, []).append(d)
+
+    results = []
+    for prefix, dirs in sorted(seed_map.items()):
+        seed = int(prefix[2:])  # "sd000" -> 0
+        step, success = best_run_for_seed(dirs)
+        if success is not None:
+            results.append((seed, step, success))
+    return results
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--exp_dir",
-        default="exp/OGBench/visual_cube_triple_play_reproduce",
-        help="Directory containing per-seed subdirectories with eval.csv files.",
-    )
-    parser.add_argument(
-        "--step",
-        type=int,
-        default=None,
-        help="Training step to read results from. Defaults to the last logged step.",
-    )
+    parser.add_argument('--exp_dir', default='impls/exp/OGBench',
+                        help='Base experiment directory.')
+    parser.add_argument('--agents', default=','.join(DEFAULT_AGENTS),
+                        help='Comma-separated list of agents.')
+    parser.add_argument('--envs', default=','.join(DEFAULT_ENVS),
+                        help='Comma-separated list of environments.')
     args = parser.parse_args()
 
-    csv_paths = sorted(glob.glob(os.path.join(args.exp_dir, "**", "eval.csv"), recursive=True))
-    if not csv_paths:
-        print(f"No eval.csv files found under {args.exp_dir}")
-        return
+    agents = args.agents.split(',')
+    envs   = args.envs.split(',')
 
-    overall_scores = []
-    task_scores = {}  # task_name -> list of success rates across seeds
+    col_w = 22
+    header = f"{'':30s}" + ''.join(f'{a:^{col_w}s}' for a in agents)
+    print(header)
+    print('-' * (30 + col_w * len(agents)))
 
-    for path in csv_paths:
-        df = pd.read_csv(path)
-        if df.empty:
-            continue
-        if args.step is not None:
-            row = df[df["step"] == args.step]
-        else:
-            row = df.iloc[[-1]]  # last row
+    for env in envs:
+        row = f'{env:30s}'
+        for agent in agents:
+            results = gather_results(args.exp_dir, agent, env)
+            if not results:
+                row += f"{'no data':^{col_w}s}"
+                continue
+            successes = [r[2] for r in results]
+            m  = np.mean(successes)
+            se = np.std(successes, ddof=1) / np.sqrt(len(successes)) if len(successes) > 1 else 0.0
+            cell = f'{m:.1f}±{se:.1f} n={len(successes)}'
+            row += f'{cell:^{col_w}s}'
+        print(row)
 
-        if row.empty:
-            print(f"  WARNING: step {args.step} not found in {path}")
-            continue
-
-        overall_col = [c for c in df.columns if "overall_success" in c]
-        if overall_col:
-            val = float(row[overall_col[0]].values[0]) * 100.0
-            overall_scores.append(val)
-            print(f"  {path}: overall_success = {val:.1f}%")
-
-        task_cols = [c for c in df.columns if c.startswith("evaluation/") and c.endswith("_success")]
-        for col in task_cols:
-            task = col.replace("evaluation/", "").replace("_success", "")
-            val = float(row[col].values[0]) * 100.0
-            task_scores.setdefault(task, []).append(val)
-
-    print("\n=== Per-task results (mean ± stderr across seeds) ===")
-    per_task_means = []
-    for task, vals in sorted(task_scores.items()):
-        m = np.mean(vals)
-        se = np.std(vals, ddof=1) / np.sqrt(len(vals)) if len(vals) > 1 else 0.0
-        per_task_means.append(m)
-        print(f"  {task}: {m:.1f} ± {se:.1f}%  (n={len(vals)})")
-
-    print("\n=== Aggregate (mean of per-task means) ===")
-    if overall_scores:
-        m = np.mean(overall_scores)
-        se = np.std(overall_scores, ddof=1) / np.sqrt(len(overall_scores)) if len(overall_scores) > 1 else 0.0
-        print(f"  Overall success: {m:.1f} ± {se:.1f}%  (n={len(overall_scores)} seeds)")
-    elif per_task_means:
-        m = np.mean(per_task_means)
-        se = np.std(per_task_means, ddof=1) / np.sqrt(len(per_task_means)) if len(per_task_means) > 1 else 0.0
-        print(f"  Mean across tasks: {m:.1f} ± {se:.1f}%")
-
-    print("\n  Paper target (Table 4): 19.8 ± 0.9%")
+    print()
+    print('Per-run details:')
+    for agent in agents:
+        for env in envs:
+            results = gather_results(args.exp_dir, agent, env)
+            if not results:
+                continue
+            target = PAPER_TARGETS.get((agent, env), '?')
+            print(f'\n  {agent} / {env}  (paper target: {target}%)')
+            for seed, step, success in results:
+                status = 'COMPLETE' if step >= 500000 else f'partial ({step // 1000}k steps)'
+                print(f'    seed {seed}: {success:.1f}%  [{status}]')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
