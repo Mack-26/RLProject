@@ -8,7 +8,7 @@
 
 REMOTE_USER="aromanan"
 REMOTE_HOST="greatlakes-xfer.arc-ts.umich.edu"
-REMOTE_DIR="~/RLProject/mqe-release/impls/exp"
+REMOTE_DIR="/home/aromanan/RLProject/mqe-release/impls/exp"
 LOCAL_DIR="$(cd "$(dirname "$0")/impls/exp" && pwd)"   # mirrors server structure locally
 
 DRY=""
