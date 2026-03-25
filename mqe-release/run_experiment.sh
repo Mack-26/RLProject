@@ -128,8 +128,20 @@ case "$AGENT" in
             --agent.subgoal_steps=10 \
             --agent.p_aug=0.5"
         ;;
+    tmd)
+        AGENT_FLAGS="--agent=agents/tmd.py \
+            --agent.batch_size=256 \
+            --agent.encoder=impala_small \
+            --agent.latent_dim=512 \
+            --agent.discount=0.995 \
+            --agent.alpha=3.0 \
+            --agent.p_aug=0.5 \
+            --agent.components=8 \
+            --agent.diag_backup=0.5 \
+            --agent.const_std=True"
+        ;;
     *)
-        echo "ERROR: Unknown AGENT=$AGENT (must be mqe or hiql)"
+        echo "ERROR: Unknown AGENT=$AGENT (must be mqe, hiql, or tmd)"
         exit 1
         ;;
 esac

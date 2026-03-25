@@ -7,12 +7,13 @@
 #
 # Skip specific combos by editing SKIP below (format: "agent:env"):
 SKIP=(
-    "mqe:visual-cube-triple-play-v0"   # already done
+    "mqe:visual-cube-triple-play-v0"   # already done (seeds 0-3)
+    "mqe:visual-scene-play-v0"         # stopping at seed 0
 )
 
 MODE=${1:-pilot}
 
-AGENTS=(mqe hiql)
+AGENTS=(mqe hiql tmd)
 ENVS=(visual-cube-triple-play-v0 visual-scene-play-v0)
 
 case "$MODE" in

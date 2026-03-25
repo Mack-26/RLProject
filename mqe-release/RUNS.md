@@ -34,44 +34,70 @@ Failed/crashed runs (not counted):
 ---
 
 ## MQE — visual-scene-play-v0
-*Run via `run_experiment.sh` (unified script).*
+*Run via `run_experiment.sh` (unified script). Stopped at seed 0 — result well below paper target.*
 
 | Seed | Job ID | Date | Duration | Last Step | Overall | Task1 | Task2 | Task3 | Task4 | Task5 | Status |
 |------|--------|------|----------|-----------|---------|-------|-------|-------|-------|-------|--------|
-| 0    | 45772681 | 2026-03-21 | — | — | — | — | — | — | — | — | Running |
-| 1    | TBD    | —    | —        | —         | —       | —     | —     | —     | —     | —     | Pending |
-| 2    | TBD    | —    | —        | —         | —       | —     | —     | —     | —     | —     | Pending |
-| 3    | TBD    | —    | —        | —         | —       | —     | —     | —     | —     | —     | Pending |
+| 0    | 45772681 | 2026-03-21 | ~7.5h | 500,000 | 17.2% | 84% | 2% | 0% | 0% | 0% | Complete |
 
-**Mean (all 4 seeds): — ± —%** | Paper target: 38.1 ± 3.2%
+**Mean (seed 0 only): 17.2%** | Paper target: 38.1 ± 3.2%
+*Note: Stopped at 1 seed — result (17.2%) is well below paper target. MQE may require more tuning for scene env.*
 
 ---
 
 ## HIQL — visual-cube-triple-play-v0
-*Run via `run_experiment.sh` (unified script).*
+*Run via `run_experiment.sh` (unified script). Seed 0 timed out at 300k, resumed via job 45839179.*
 
 | Seed | Job ID | Date | Duration | Last Step | Overall | Task1 | Task2 | Task3 | Task4 | Task5 | Status |
 |------|--------|------|----------|-----------|---------|-------|-------|-------|-------|-------|--------|
-| 0    | 45772682 | 2026-03-21 | — | — | — | — | — | — | — | — | Running |
+| 0    | 45772682 + 45839179 | 2026-03-22 | ~15h total | 500,000 | 20.8% | 100% | 0% | 4% | 0% | 0% | Complete |
 | 1    | TBD    | —    | —        | —         | —       | —     | —     | —     | —     | —     | Pending |
 | 2    | TBD    | —    | —        | —         | —       | —     | —     | —     | —     | —     | Pending |
 | 3    | TBD    | —    | —        | —         | —       | —     | —     | —     | —     | —     | Pending |
 
-**Mean (all 4 seeds): — ± —%** | Paper target: 21.0 ± 0.2%
+**Mean (seed 0 only): 20.8%** | Paper target: 21.0 ± 0.2%
 
 ---
 
 ## HIQL — visual-scene-play-v0
-*Run via `run_experiment.sh` (unified script).*
+*Run via `run_experiment.sh` (unified script). Seed 0 timed out at 300k, resumed via job 45839193.*
 
 | Seed | Job ID | Date | Duration | Last Step | Overall | Task1 | Task2 | Task3 | Task4 | Task5 | Status |
 |------|--------|------|----------|-----------|---------|-------|-------|-------|-------|-------|--------|
-| 0    | 45772683 | 2026-03-21 | — | — | — | — | — | — | — | — | Running |
+| 0    | 45772683 + 45839193 | 2026-03-22 | ~15h total | 500,000 | 42.4% | 66% | 38% | 64% | 36% | 8% | Complete |
 | 1    | TBD    | —    | —        | —         | —       | —     | —     | —     | —     | —     | Pending |
 | 2    | TBD    | —    | —        | —         | —       | —     | —     | —     | —     | —     | Pending |
 | 3    | TBD    | —    | —        | —         | —       | —     | —     | —     | —     | —     | Pending |
 
-**Mean (all 4 seeds): — ± —%** | Paper target: 49.9 ± 0.6%
+**Mean (seed 0 only): 42.4%** | Paper target: 49.9 ± 0.6%
+
+---
+
+## TMD — visual-cube-triple-play-v0
+*Run via `run_experiment.sh` (unified script). Not in paper Table 4 — added as extra comparison.*
+
+| Seed | Job ID | Date | Duration | Last Step | Overall | Task1 | Task2 | Task3 | Task4 | Task5 | Status |
+|------|--------|------|----------|-----------|---------|-------|-------|-------|-------|-------|--------|
+| 0    | TBD    | —    | —        | —         | —       | —     | —     | —     | —     | —     | Pending |
+| 1    | TBD    | —    | —        | —         | —       | —     | —     | —     | —     | —     | Pending |
+| 2    | TBD    | —    | —        | —         | —       | —     | —     | —     | —     | —     | Pending |
+| 3    | TBD    | —    | —        | —         | —       | —     | —     | —     | —     | —     | Pending |
+
+**Mean (all 4 seeds): — ± —%** | Paper target: N/A (not in Table 4)
+
+---
+
+## TMD — visual-scene-play-v0
+*Run via `run_experiment.sh` (unified script). Not in paper Table 4 — added as extra comparison.*
+
+| Seed | Job ID | Date | Duration | Last Step | Overall | Task1 | Task2 | Task3 | Task4 | Task5 | Status |
+|------|--------|------|----------|-----------|---------|-------|-------|-------|-------|-------|--------|
+| 0    | TBD    | —    | —        | —         | —       | —     | —     | —     | —     | —     | Pending |
+| 1    | TBD    | —    | —        | —         | —       | —     | —     | —     | —     | —     | Pending |
+| 2    | TBD    | —    | —        | —         | —       | —     | —     | —     | —     | —     | Pending |
+| 3    | TBD    | —    | —        | —         | —       | —     | —     | —     | —     | —     | Pending |
+
+**Mean (all 4 seeds): — ± —%** | Paper target: N/A (not in Table 4)
 
 ---
 

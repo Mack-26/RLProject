@@ -30,7 +30,7 @@ ENV_SHORTS = {
     'visual-scene-play-v0':       'visual_scene_play',
 }
 
-DEFAULT_AGENTS = ['mqe', 'hiql']
+DEFAULT_AGENTS = ['mqe', 'hiql', 'tmd']
 DEFAULT_ENVS   = ['visual-cube-triple-play-v0', 'visual-scene-play-v0']
 
 
