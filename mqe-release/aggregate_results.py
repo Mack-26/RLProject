@@ -50,11 +50,18 @@ def read_csv(path):
 
 
 def best_run_for_seed(seed_dirs):
-    """Given a list of run directories for one seed, return (last_step, overall_success)
-    from the directory whose eval.csv has the highest last logged step."""
-    best_step = -1
-    best_success = None
-    for d in seed_dirs:
+    """Given a list of run directories for one seed, return (total_steps, overall_success)
+    treating the directories as a sequential chain sorted by timestamp.
+    Resumed runs reset their step counter to 1, so we sum steps across all runs
+    and report the final run's last eval as the result."""
+    def dir_timestamp(d):
+        # dir format: sd000_s_JOBID.0.YYYYMMDD_HHMMSS
+        parts = os.path.basename(d).split('.')
+        return parts[-1] if len(parts) >= 3 else os.path.basename(d)
+
+    total_steps = 0
+    final_success = None
+    for d in sorted(seed_dirs, key=dir_timestamp):
         csv = os.path.join(d, 'eval.csv')
         if not os.path.exists(csv):
             continue
@@ -67,10 +74,9 @@ def best_run_for_seed(seed_dirs):
             success = float(last.get('evaluation/overall_success', -1))
         except ValueError:
             continue
-        if step > best_step:
-            best_step = step
-            best_success = success * 100.0
-    return best_step, best_success
+        total_steps += step
+        final_success = success * 100.0
+    return total_steps, final_success
 
 
 def gather_results(exp_base, agent, env):
