@@ -10,10 +10,10 @@
 
 #SBATCH --job-name=rl_exp
 #SBATCH --account=ece567w26_class
-#SBATCH --partition=gpu
+#SBATCH --partition=spgpu
 #SBATCH --qos=class
 #SBATCH --gpus=1
-#SBATCH --cpus-per-task=4
+#SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
 #SBATCH --time=07:30:00
 #SBATCH --output=/home/aromanan/RLProject/mqe-release/logs/exp_%j.out

@@ -74,28 +74,28 @@ Failed/crashed runs (not counted):
 ---
 
 ## TMD — visual-cube-triple-play-v0
-*Run via `run_experiment.sh` (unified script). Not in paper Table 4 — added as extra comparison.*
+*Run via `run_experiment.sh`. Seeds split across 3 accounts for parallel execution.*
 
-| Seed | Job ID | Date | Duration | Last Step | Overall | Task1 | Task2 | Task3 | Task4 | Task5 | Status |
-|------|--------|------|----------|-----------|---------|-------|-------|-------|-------|-------|--------|
-| 0    | 46119366 | 2026-03-25 | —        | —         | —       | —     | —     | —     | —     | —     | Queued |
-| 1    | 46119367 | 2026-03-25 | —        | —         | —       | —     | —     | —     | —     | —     | Queued |
-| 2    | 46119368 | 2026-03-25 | —        | —         | —       | —     | —     | —     | —     | —     | Queued |
-| 3    | 46119369 | 2026-03-25 | —        | —         | —       | —     | —     | —     | —     | —     | Queued |
+| Seed | Job ID | Account | Date | Duration | Last Step | Overall | Task1 | Task2 | Task3 | Task4 | Task5 | Status |
+|------|--------|---------|------|----------|-----------|---------|-------|-------|-------|-------|-------|--------|
+| 0    | 46119366 | ece567w26_class    | 2026-03-28 | — | — | — | — | — | — | — | — | Queued |
+| 1    | 46281518 | eecs504s001w26_class | 2026-03-28 | — | — | — | — | — | — | — | — | Running |
+| 2    | 46281521 | eecs504s001w26_class | 2026-03-28 | — | — | — | — | — | — | — | — | Queued |
+| 3    | 46281526 | eecs545w26_class   | 2026-03-28 | — | — | — | — | — | — | — | — | Running |
 
 **Mean (all 4 seeds): — ± —%** | Paper target: N/A (not in Table 4)
 
 ---
 
 ## TMD — visual-scene-play-v0
-*Run via `run_experiment.sh` (unified script). Not in paper Table 4 — added as extra comparison.*
+*Run via `run_experiment.sh`. Seeds split across 3 accounts for parallel execution.*
 
-| Seed | Job ID | Date | Duration | Last Step | Overall | Task1 | Task2 | Task3 | Task4 | Task5 | Status |
-|------|--------|------|----------|-----------|---------|-------|-------|-------|-------|-------|--------|
-| 0    | 46119370 | 2026-03-25 | —        | —         | —       | —     | —     | —     | —     | —     | Queued |
-| 1    | 46119371 | 2026-03-25 | —        | —         | —       | —     | —     | —     | —     | —     | Queued |
-| 2    | 46119372 | 2026-03-25 | —        | —         | —       | —     | —     | —     | —     | —     | Queued |
-| 3    | 46119373 | 2026-03-25 | —        | —         | —       | —     | —     | —     | —     | —     | Queued |
+| Seed | Job ID | Account | Date | Duration | Last Step | Overall | Task1 | Task2 | Task3 | Task4 | Task5 | Status |
+|------|--------|---------|------|----------|-----------|---------|-------|-------|-------|-------|-------|--------|
+| 0    | 46119370 | ece567w26_class    | 2026-03-28 | — | — | — | — | — | — | — | — | Queued |
+| 1    | 46281522 | eecs504s001w26_class | 2026-03-28 | — | — | — | — | — | — | — | — | Queued |
+| 2    | 46281527 | eecs545w26_class   | 2026-03-28 | — | — | — | — | — | — | — | — | Queued |
+| 3    | 46281528 | eecs545w26_class   | 2026-03-28 | — | — | — | — | — | — | — | — | Queued |
 
 **Mean (all 4 seeds): — ± —%** | Paper target: N/A (not in Table 4)
 
