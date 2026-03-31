@@ -1,7 +1,7 @@
 """
-plot_results.py — Learning curves for MQE, HIQL, TMD on OGBench visual environments.
+plot_results.py — Bar chart of final performance for MQE, HIQL, TMD on OGBench visual envs.
 
-Reads local eval CSVs, correctly stitches resumed runs, plots mean ± stderr across seeds.
+Reads local eval CSVs, correctly stitches resumed runs, reports mean ± stderr at final step.
 
 Usage:
     python plot_results.py                    # reads from impls/exp/OGBench
@@ -14,6 +14,7 @@ import glob
 import os
 
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 import numpy as np
 
 # ── Config ────────────────────────────────────────────────────────────────────
@@ -31,11 +32,12 @@ ENV_DISPLAY = {
 AGENT_DISPLAY = {'mqe': 'MQE', 'hiql': 'HIQL', 'tmd': 'TMD'}
 COLORS        = {'mqe': '#2196F3', 'hiql': '#4CAF50', 'tmd': '#FF9800'}
 
-# MQE cube-triple was run before unified naming — lives in a different dir
+# MQE cube-triple was run before unified naming
 SPECIAL_RUN_GROUPS = {
     ('mqe', 'visual-cube-triple-play-v0'): 'visual_cube_triple_play_reproduce',
 }
 
+# Paper-reported targets (Table 4). TMD not evaluated in paper on visual envs.
 PAPER_TARGETS = {
     ('mqe',  'visual-cube-triple-play-v0'): 19.8,
     ('hiql', 'visual-cube-triple-play-v0'): 21.0,
@@ -43,10 +45,8 @@ PAPER_TARGETS = {
     ('hiql', 'visual-scene-play-v0'):       49.9,
 }
 
-TARGET_STEPS = np.array([100_000, 200_000, 300_000, 400_000, 500_000])
 
-
-# ── Helpers ───────────────────────────────────────────────────────────────────
+# ── CSV helpers ───────────────────────────────────────────────────────────────
 def _dir_ts(d):
     parts = os.path.basename(d).split('.')
     return parts[-1] if len(parts) >= 3 else os.path.basename(d)
@@ -66,10 +66,10 @@ def _read_csv(path):
     return rows
 
 
-def _seed_curve(seed_dirs):
-    """Return list of (absolute_step, success_pct) stitching sequential resumed runs."""
+def _final_success(seed_dirs):
+    """Return final overall success % for a seed, stitching resumed runs."""
     step_offset = 0
-    points = []
+    final = None
     for d in sorted(seed_dirs, key=_dir_ts):
         csv = os.path.join(d, 'eval.csv')
         if not os.path.exists(csv):
@@ -84,96 +84,79 @@ def _seed_curve(seed_dirs):
                 continue
             if step <= 1:
                 continue
-            points.append((step_offset + step, success * 100.0))
+            final = success * 100.0
             last_valid = step
         step_offset += last_valid
-    return points
+    return final
 
 
-def _interp(points, steps):
-    """Linearly interpolate a curve to given step values; NaN outside range."""
-    if not points:
-        return [np.nan] * len(steps)
-    xs, ys = zip(*sorted(points))
-    xs, ys = np.array(xs, float), np.array(ys, float)
-    out = []
-    for s in steps:
-        if s < xs[0] or s > xs[-1]:
-            out.append(np.nan)
-        else:
-            out.append(float(np.interp(s, xs, ys)))
-    return out
-
-
-def gather(exp_base, agent, env):
-    """Return {seed: [(step, pct), ...]} for one (agent, env) combo."""
-    env_short  = ENV_SHORTS.get(env, env.replace('-', '_').replace('_v0', ''))
-    run_group  = SPECIAL_RUN_GROUPS.get((agent, env), f'{agent}_{env_short}')
-    group_dir  = os.path.join(exp_base, run_group)
+def gather_finals(exp_base, agent, env):
+    """Return list of final success % values, one per seed."""
+    env_short = ENV_SHORTS.get(env, env.replace('-', '_').replace('_v0', ''))
+    run_group = SPECIAL_RUN_GROUPS.get((agent, env), f'{agent}_{env_short}')
+    group_dir = os.path.join(exp_base, run_group)
     if not os.path.isdir(group_dir):
-        return {}
+        return []
 
     seed_map = {}
     for d in sorted(glob.glob(os.path.join(group_dir, 'sd*'))):
         prefix = os.path.basename(d)[:5]
         seed_map.setdefault(prefix, []).append(d)
 
-    curves = {}
+    results = []
     for prefix, dirs in sorted(seed_map.items()):
-        pts = _seed_curve(dirs)
-        if pts:
-            curves[int(prefix[2:])] = pts
-    return curves
+        val = _final_success(dirs)
+        if val is not None:
+            results.append(val)
+    return results
 
 
 # ── Plot ──────────────────────────────────────────────────────────────────────
 def plot(exp_base='impls/exp/OGBench', out='results_plot.png'):
-    fig, axes = plt.subplots(1, 2, figsize=(13, 5), sharey=False)
-    steps_k = TARGET_STEPS / 1_000
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+    bar_width = 0.22
+    x = np.arange(len(AGENTS))
 
     for ax, env in zip(axes, ENVS):
-        for agent in AGENTS:
-            curves = gather(exp_base, agent, env)
-            if not curves:
+        for i, agent in enumerate(AGENTS):
+            vals = gather_finals(exp_base, agent, env)
+            if not vals:
                 continue
-
-            matrix = np.array([_interp(pts, TARGET_STEPS)
-                                for pts in curves.values()])   # (n_seeds, n_steps)
-            mean = np.nanmean(matrix, axis=0)
-            se   = np.nanstd(matrix, axis=0, ddof=1) / np.sqrt(
-                       np.sum(~np.isnan(matrix), axis=0).clip(1))
-            valid = ~np.isnan(mean)
+            mean = np.mean(vals)
+            se   = np.std(vals, ddof=1) / np.sqrt(len(vals)) if len(vals) > 1 else 0.0
             color = COLORS[agent]
 
-            ax.plot(steps_k[valid], mean[valid],
-                    color=color, linewidth=2, marker='o', markersize=4,
-                    label=f'{AGENT_DISPLAY[agent]} (n={len(curves)})')
-            ax.fill_between(steps_k[valid],
-                            mean[valid] - se[valid],
-                            mean[valid] + se[valid],
-                            color=color, alpha=0.18)
+            bar = ax.bar(i, mean, bar_width * 2.5,
+                         color=color, alpha=0.85, zorder=3,
+                         label=f'{AGENT_DISPLAY[agent]} ({mean:.1f}±{se:.1f}%, n={len(vals)})')
+            ax.errorbar(i, mean, yerr=se,
+                        fmt='none', color='black', capsize=5, linewidth=1.5, zorder=4)
 
-        # Dashed paper-target lines
+        # Paper target lines
         for agent in ['mqe', 'hiql']:
             tgt = PAPER_TARGETS.get((agent, env))
             if tgt:
                 ax.axhline(tgt, color=COLORS[agent], linestyle='--',
-                           linewidth=1.2, alpha=0.55,
-                           label=f'{AGENT_DISPLAY[agent]} paper target')
+                           linewidth=1.5, alpha=0.7,
+                           label=f'{AGENT_DISPLAY[agent]} paper ({tgt}%)')
 
-        ax.set_title(ENV_DISPLAY[env], fontsize=12, fontweight='bold')
-        ax.set_xlabel('Training Steps (k)', fontsize=10)
-        ax.set_ylabel('Overall Success (%)', fontsize=10)
-        ax.set_xlim(50, 520)
-        ax.set_ylim(bottom=0)
+        ax.set_title(ENV_DISPLAY[env], fontsize=13, fontweight='bold')
+        ax.set_xticks(range(len(AGENTS)))
+        ax.set_xticklabels([AGENT_DISPLAY[a] for a in AGENTS], fontsize=11)
+        ax.set_ylabel('Overall Success Rate (%)', fontsize=10)
+        ax.set_ylim(0, max(55, ax.get_ylim()[1] * 1.15))
         ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f'{y:.0f}%'))
-        ax.legend(fontsize=8, loc='upper left')
-        ax.grid(True, alpha=0.25)
+        ax.legend(fontsize=8, loc='upper right')
+        ax.grid(True, axis='y', alpha=0.3, zorder=0)
+        ax.set_axisbelow(True)
 
     fig.suptitle(
         'Goal-Conditioned RL on OGBench Visual Environments\n'
-        'Mean ± Std Error across seeds',
-        fontsize=13, fontweight='bold', y=1.01)
+        'Final performance at 500k steps (mean ± std error across seeds)\n'
+        'Dashed lines: paper-reported targets (Table 4)',
+        fontsize=11, y=1.02)
+
     plt.tight_layout()
     plt.savefig(out, dpi=150, bbox_inches='tight')
     print(f'Saved → {out}')

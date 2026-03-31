@@ -15,11 +15,6 @@ https://github.com/Mack-26/RLProject.git
 
 ## Great Lakes Setup
 
-**Login:**
-```bash
-ssh aromanan@greatlakes.arc-ts.umich.edu
-```
-
 **Repo location:**
 ```
 ~/RLProject/mqe-release/
@@ -30,11 +25,11 @@ ssh aromanan@greatlakes.arc-ts.umich.edu
 conda activate mqe
 ```
 
-**Dataset location:**
+<!-- **Dataset location:**
 ```
 ~/ogbench_data/visual-cube-triple-play-v0.npz       (~4.8 GB, train)
 ~/ogbench_data/visual-cube-triple-play-v0-val.npz   (val)
-```
+``` -->
 
 **Logs output:**
 ```
@@ -49,7 +44,6 @@ conda activate mqe
 | Account | GPU limit | Max walltime | Notes |
 |---------|-----------|-------------|-------|
 | `ece567w26_class` | 1 GPU at a time | 8:00:00 | Use this for class project |
-| `engin1` | 2 GPUs | default | Backup |
 
 ---
 
@@ -61,7 +55,7 @@ conda activate mqe
 python ~/RLProject/mqe-release/download_dataset.py --dataset_dir ~/ogbench_data
 ```
 
-**Submit all 4 seeds:**
+**Submit all 4 seeds (Sample Script):**
 ```bash
 cd ~/RLProject/mqe-release
 mkdir -p logs
@@ -80,8 +74,8 @@ sbatch --export=SEED=0 --array=0 run_mqe_visual_cube_triple_play.sh
 ## Monitoring Jobs
 
 ```bash
-squeue -u aromanan          # running/pending jobs
-sacct -u aromanan           # completed job history
+squeue -u <username>          # running/pending jobs
+sacct -u <username>          # completed job history
 scancel <jobid>             # cancel a job
 ```
 
