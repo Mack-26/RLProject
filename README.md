@@ -1,7 +1,6 @@
 # ECE 567 RL Project — MQE Reproduction
 
 Reproducing Table 4 of **"Multistep Quasimetric Learning for Scalable Goal-Conditioned RL"** (ICLR 2026)
-Target: `visual-cube-triple-play-v0` on OGBench → **19.8 ± 0.9%** success rate (4 seeds)
 
 ---
 
