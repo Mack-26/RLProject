@@ -12,12 +12,12 @@
 
 # -----------------------------------------------------------------------
 # Usage:
-#   sbatch run_experiment.sh                        # adaptive, navigation
-#   ALGO=scheduled sbatch run_experiment.sh
-#   ALGO=adaptive FEATURES=global,local,disagree sbatch run_experiment.sh
+#   sbatch run_experiment.sh                                     # adaptive, navigation, ece567w26_class
 #   ALGO=mappo ENV=wheel sbatch run_experiment.sh
+#   ALGO=adaptive ENV=wheel sbatch --account=eecs504s --partition=spgpu run_experiment.sh
+#   ALGO=adaptive ENV=balance sbatch --account=eecs545w --partition=spgpu run_experiment.sh
 #
-# SLURM_ARRAY_TASK_ID is used as the random seed (0-3 for 4 seeds).
+# SLURM_ARRAY_TASK_ID is used as the random seed.
 # -----------------------------------------------------------------------
 
 ALGO=${ALGO:-adaptive}

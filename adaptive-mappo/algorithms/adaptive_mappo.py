@@ -38,8 +38,6 @@ class AdaptiveAlphaNetwork(nn.Module):
                 self.register_parameter(f"w_{name}", nn.Parameter(torch.randn(1) * 0.01))
 
         self.phi = nn.Parameter(torch.zeros(1))
-        # Register as buffer so it moves to correct device and is serialized
-        self.register_buffer("last_alpha_mean", torch.tensor(0.0))
 
     def _get_w(self, name: str) -> torch.Tensor:
         return getattr(self, f"w_{name}")
@@ -65,7 +63,6 @@ class AdaptiveAlphaNetwork(nn.Module):
             logits = logits + self._get_w("ratio") * (v_global / (torch.abs(v_local) + 1e-5))
 
         alpha = torch.sigmoid(logits)
-        self.last_alpha_mean.fill_(alpha.mean().item())
         v_mix = alpha * v_global + (1.0 - alpha) * v_local
         return v_mix, alpha
 
