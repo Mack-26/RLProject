@@ -1,0 +1,34 @@
+# Shared experiment settings for all algorithms on vmas/navigation
+# Tune max_n_frames and on_policy_collected_frames_per_batch first if runs are too slow
+
+sampling_device: "cpu"
+train_device: "cuda"
+share_policy_params: true
+prefer_continuous_actions: false
+
+lr: 5.0e-4
+adam_eps: 1.0e-5
+max_n_frames: 3_000_000
+
+# On-policy batch config
+on_policy_collected_frames_per_batch: 6000
+on_policy_minibatch_size: 400
+on_policy_n_minibatch_epochs: 45
+
+gamma: 0.99
+
+# Evaluation
+evaluation: true
+render: false
+evaluation_interval: 20
+evaluation_episodes: 10
+
+# Checkpointing
+checkpoint_interval: 200
+checkpoint_at_end: true
+keep_checkpoints_num: 3
+create_json: true
+
+# Logging — "wandb" can be added here when ready
+loggers: []
+log_interval: 10

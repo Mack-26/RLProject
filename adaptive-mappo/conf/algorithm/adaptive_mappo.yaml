@@ -1,0 +1,17 @@
+share_param_critic: true
+clip_epsilon: 0.2
+entropy_coef: 0.01
+critic_coef: 1.0
+loss_critic_type: l2
+lmbda: 0.95
+scale_mapping: softplus
+use_tanh_normal: false
+minibatch_advantage: false
+# Ablate features here — any subset of: global, local, disagree, team_var, risk, ratio
+features:
+  - global
+  - local
+  - disagree
+  - team_var
+  - risk
+  - ratio
