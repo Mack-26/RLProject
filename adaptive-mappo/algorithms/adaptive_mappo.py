@@ -263,6 +263,12 @@ class AdaptiveMappo(Algorithm):
     def process_loss_vals(self, group: str, loss_vals: TensorDictBase) -> TensorDictBase:
         loss_vals.set("loss_objective", loss_vals["loss_objective"] + loss_vals["loss_entropy"])
         del loss_vals["loss_entropy"]
+        # Log mean alpha so we can track how the mixing weight evolves
+        if group in self._adaptive_nets:
+            net = self._adaptive_nets[group]
+            with torch.no_grad():
+                alpha_mean = torch.sigmoid(net.phi).item()
+            loss_vals.set("alpha_mean", torch.tensor(alpha_mean))
         return loss_vals
 
     #####################

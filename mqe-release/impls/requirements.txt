@@ -1,6 +1,0 @@
-# Install the local ogbench (includes antmaze-colossal environments) from the repo root:
-#   pip install -e ".[train]"
-# That covers jax, flax, distrax, ml_collections, wandb, matplotlib, moviepy,
-# mujoco, dm_control, and gymnasium. Then install the two extras below:
-absl-py
-tqdm
