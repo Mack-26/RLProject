@@ -1,0 +1,14 @@
+share_param_critic: true
+clip_epsilon: 0.2
+entropy_coef: 0.01
+critic_coef: 1.0
+loss_critic_type: l2
+lmbda: 0.95
+scale_mapping: softplus
+use_tanh_normal: false
+minibatch_advantage: false
+# Schedule: "linear", "cosine", or "constant"
+# alpha=1.0 => pure MAPPO, alpha=0.0 => pure IPPO
+alpha_schedule: linear
+alpha_start: 1.0
+alpha_end: 0.0

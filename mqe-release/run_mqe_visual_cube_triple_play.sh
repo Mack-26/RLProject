@@ -10,14 +10,14 @@
 #   sbatch --export=SEED=0 run_mqe_visual_cube_triple_play.sh
 
 #SBATCH --job-name=mqe_visual_cube_triple
-#SBATCH --account=<YOUR_ACCOUNT>        # e.g., eecs567s001 -- change this
+#SBATCH --account=engin1
 #SBATCH --partition=gpu
 #SBATCH --gpus=1
-#SBATCH --cpus-per-task=4
-#SBATCH --mem=32G
-#SBATCH --time=10:00:00                 # paper reports ~6h on A6000; 10h is safe
-#SBATCH --output=logs/mqe_vct_%A_%a.out
-#SBATCH --error=logs/mqe_vct_%A_%a.err
+#SBATCH --cpus-per-task=2
+#SBATCH --mem=64G
+#SBATCH --time=12:00:00                 # engin1 has no strict MaxWall; 12h covers ~8.5h runtime
+#SBATCH --output=/home/aromanan/RLProject/logs/mqe_vct_%A_%a.out
+#SBATCH --error=/home/aromanan/RLProject/logs/mqe_vct_%A_%a.err
 #SBATCH --array=0-3                     # 4 seeds, matching paper's pixel-based eval
 
 # ── Seed: use SLURM array index if available, else fall back to $SEED ──────────
@@ -31,22 +31,19 @@ echo "  Node : $(hostname)"
 echo "  GPU  : $(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null || echo 'N/A')"
 
 # ── Environment ─────────────────────────────────────────────────────────────────
-module load anaconda3/2023.09
+module load python3.10-anaconda/2023.03
 module load cuda/12.1.1
-module load cudnn/12.1-v8.9.0
 
-# Initialize conda for non-interactive shell (required in SLURM)
-source "$(conda info --base)/etc/profile.d/conda.sh"
-conda activate mqe
+PYTHON="/home/aromanan/.conda/envs/mqe/bin/python"
 
 # EGL rendering for MuJoCo (headless GPU rendering)
 export MUJOCO_GL=egl
 export EGL_DEVICE_ID=${SLURM_STEP_GPUS:-0}
 
 # ── Paths ───────────────────────────────────────────────────────────────────────
-REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_DIR="$HOME/RLProject/mqe-release"
 IMPLS_DIR="$REPO_DIR/impls"
-mkdir -p "$REPO_DIR/logs"
+mkdir -p "$HOME/RLProject/logs"
 
 # Path to the pre-downloaded dataset (run download_dataset.py first).
 # Default: ~/ogbench_data/visual-cube-triple-play-v0.npz
@@ -67,12 +64,13 @@ echo "  Dataset : $DATASET_PATH"
 
 cd "$IMPLS_DIR"
 
-python main.py \
+$PYTHON main.py \
     --run_group="visual_cube_triple_play_reproduce" \
     --seed=$SEED \
     --env_name=visual-cube-triple-play-v0 \
     --dataset_path="$DATASET_PATH" \
     --train_steps=500000 \
+    --save_interval=100000 \
     --log_interval=5000 \
     --eval_interval=100000 \
     --eval_episodes=50 \

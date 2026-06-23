@@ -22,3 +22,27 @@ checkpoints/
 
 # macOS
 .DS_Store
+
+# Root-level stray file
+adaptive_mappo.py
+
+# mqe-release: ignore everything except .sh and .slurm scripts
+mqe-release/.env
+mqe-release/.gitignore
+mqe-release/ogbench/
+mqe-release/impls/agents/
+mqe-release/impls/utils/
+mqe-release/impls/main.py
+mqe-release/impls/requirements.txt
+mqe-release/data_gen_scripts/*.py
+mqe-release/assets/
+mqe-release/*.py
+mqe-release/*.md
+mqe-release/*.png
+mqe-release/*.toml
+mqe-release/LICENSE
+mqe-release/CHANGELOG.md
+mqe-release/RUNS.md
+
+# Untracked directories
+567_share/
